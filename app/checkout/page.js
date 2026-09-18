@@ -1,8 +1,8 @@
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const PLANS = {
   starting: { name: "Starting", price: 4900, maxCompetitors: 5 },
@@ -10,7 +10,7 @@ const PLANS = {
   max: { name: "Max", price: 16000, maxCompetitors: 50 },
 };
 
-export default function CheckoutPage() {
+function CheckoutInner() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -194,5 +194,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">Loading...</div>}>
+      <CheckoutInner />
+    </Suspense>
   );
 }
