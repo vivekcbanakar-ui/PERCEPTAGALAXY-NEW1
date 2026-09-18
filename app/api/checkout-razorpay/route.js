@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "./auth/[...nextauth]/route";
+import { authOptions } from "./[...nextauth]/route";
 import Razorpay from "razorpay";
 import { z } from "zod";
 
