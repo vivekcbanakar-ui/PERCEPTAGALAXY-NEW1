@@ -1,14 +1,21 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn, getProviders } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [emailEnabled, setEmailEnabled] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    getProviders().then((providers) => {
+      setEmailEnabled(Boolean(providers?.email));
+    });
+  }, []);
 
   const handleEmailSignIn = async (e) => {
     e.preventDefault();
@@ -52,51 +59,45 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Email Sign In */}
-          <form onSubmit={handleEmailSignIn} className="mb-6">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 mb-4"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg font-bold text-white transition"
-            >
-              {loading ? "Sending..." : "Sign in with Email"}
-            </button>
-          </form>
+          {emailEnabled && (
+            <>
+              {/* Email Sign In */}
+              <form onSubmit={handleEmailSignIn} className="mb-6">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 mb-4"
+                />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg font-bold text-white transition"
+                >
+                  {loading ? "Sending..." : "Sign in with Email"}
+                </button>
+              </form>
 
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-purple-500/20"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-purple-900/40 text-slate-400">or</span>
-            </div>
-          </div>
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-purple-500/20"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-purple-900/40 text-slate-400">or</span>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Google Sign In */}
           <button
             onClick={handleGoogleSignIn}
-            className="w-full px-4 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-bold text-white transition"
+            className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-bold text-white transition"
           >
             Sign in with Google
           </button>
-
-          <p className="text-center text-slate-400 text-sm mt-6">
-            Don't have an account?{" "}
-            <button
-              onClick={handleEmailSignIn}
-              className="text-purple-400 hover:text-purple-300"
-            >
-              Create one with email
-            </button>
-          </p>
         </div>
       </div>
     </div>
