@@ -17,6 +17,10 @@ export default function LoginPage() {
     });
   }, []);
 
+  const handleGithubSignIn = () => {
+    signIn("github", { callbackUrl: "/dashboard" });
+  };
+
   const handleEmailSignIn = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -94,9 +98,17 @@ export default function LoginPage() {
           {/* Google Sign In */}
           <button
             onClick={handleGoogleSignIn}
-            className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-bold text-white transition"
+            className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-bold text-white transition mb-3"
           >
             Sign in with Google
+          </button>
+
+          {/* GitHub Sign In */}
+          <button
+            onClick={handleGithubSignIn}
+            className="w-full px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg font-bold text-white transition"
+          >
+            Sign in with GitHub
           </button>
         </div>
       </div>
