@@ -1,6 +1,9 @@
-"use client";
-
 import Link from "next/link";
+
+export const metadata = {
+  title: "Privacy Policy",
+  description: "Percepta Galaxy Privacy Policy - how we handle your data",
+};
 
 export default function PrivacyPage() {
   return (
@@ -123,8 +126,3 @@ function Section({ title, children }) {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Privacy Policy",
-  description: "Percepta Galaxy Privacy Policy - how we handle your data",
-};

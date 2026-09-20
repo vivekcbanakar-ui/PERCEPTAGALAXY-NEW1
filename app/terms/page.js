@@ -1,6 +1,9 @@
-"use client";
-
 import Link from "next/link";
+
+export const metadata = {
+  title: "Terms of Service",
+  description: "Percepta Galaxy Terms of Service - rules for using our platform",
+};
 
 export default function TermsPage() {
   return (
@@ -108,8 +111,3 @@ function Section({ title, children }) {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Terms of Service",
-  description: "Percepta Galaxy Terms of Service - rules for using our platform",
-};
