@@ -111,6 +111,29 @@ export default function Home() {
           View Plans →
         </Link>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-purple-500/20 mt-12">
+        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-slate-400 text-sm">
+            © 2026 Percepta Galaxy. All rights reserved.
+          </p>
+          <div className="flex gap-6 text-sm">
+            <Link href="/terms" className="text-slate-400 hover:text-purple-400 transition">
+              Terms
+            </Link>
+            <Link href="/privacy" className="text-slate-400 hover:text-purple-400 transition">
+              Privacy
+            </Link>
+            <a
+              href="mailto:support@perceptagalaxy.com"
+              className="text-slate-400 hover:text-purple-400 transition"
+            >
+              Contact
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
