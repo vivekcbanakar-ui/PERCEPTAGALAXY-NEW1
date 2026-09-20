@@ -126,7 +126,7 @@ export default function Home() {
               Privacy
             </Link>
             <a
-              href="mailto:support@perceptagalaxy.com"
+              href="mailto:vivekcbanakar@gmail.com"
               className="text-slate-400 hover:text-purple-400 transition"
             >
               Contact

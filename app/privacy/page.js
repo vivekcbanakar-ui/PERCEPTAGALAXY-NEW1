@@ -87,7 +87,7 @@ export default function PrivacyPage() {
             <li>Export your data</li>
             <li>Object to processing</li>
           </ul>
-          Email <a href="mailto:privacy@perceptagalaxy.com" className="text-purple-400 hover:underline">privacy@perceptagalaxy.com</a> to exercise these rights.
+          Email <a href="mailto:vivekcbanakar@gmail.com" className="text-purple-400 hover:underline">vivekcbanakar@gmail.com</a> to exercise these rights.
         </Section>
 
         <Section title="8. Children's Privacy">
@@ -109,8 +109,8 @@ export default function PrivacyPage() {
         <Section title="11. Contact">
           For privacy questions or to exercise your rights:
           <br />
-          <a href="mailto:privacy@perceptagalaxy.com" className="text-purple-400 hover:underline">
-            privacy@perceptagalaxy.com
+          <a href="mailto:vivekcbanakar@gmail.com" className="text-purple-400 hover:underline">
+            vivekcbanakar@gmail.com
           </a>
         </Section>
       </div>

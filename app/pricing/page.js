@@ -154,7 +154,7 @@ export default function PricingPage() {
             For enterprise customers with unique needs, we offer custom pricing.
           </p>
           <a
-            href="mailto:contact@perceptagalaxy.com"
+            href="mailto:vivekcbanakar@gmail.com"
             className="inline-block px-8 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-bold transition"
           >
             Contact Sales

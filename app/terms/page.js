@@ -93,8 +93,8 @@ export default function TermsPage() {
 
         <Section title="13. Contact">
           Questions about these Terms? Email us at{" "}
-          <a href="mailto:legal@perceptagalaxy.com" className="text-purple-400 hover:underline">
-            legal@perceptagalaxy.com
+          <a href="mailto:vivekcbanakar@gmail.com" className="text-purple-400 hover:underline">
+            vivekcbanakar@gmail.com
           </a>
           .
         </Section>
