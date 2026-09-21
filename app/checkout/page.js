@@ -5,9 +5,9 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const PLANS = {
-  starting: { name: "Starting", price: 4900, maxCompetitors: 5 },
-  pro: { name: "Pro", price: 12000, maxCompetitors: 20 },
-  max: { name: "Max", price: 16000, maxCompetitors: 50 },
+  starter: { name: "Starter", price: 99, maxCompetitors: 1 },
+  growth: { name: "Growth", price: 399, maxCompetitors: 3 },
+  scale: { name: "Scale", price: 999, maxCompetitors: 10 },
 };
 
 function CheckoutInner() {
@@ -17,8 +17,8 @@ function CheckoutInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const planName = searchParams.get("plan") || "pro";
-  const plan = PLANS[planName] || PLANS.pro;
+  const planName = searchParams.get("plan") || "growth";
+  const plan = PLANS[planName] || PLANS.growth;
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -69,8 +69,8 @@ function CheckoutInner() {
         const options = {
           key: razorpayKeyId,
           order_id: orderId,
-          amount: plan.price * 100, // Razorpay expects amount in paise
-          currency: "INR",
+          amount: plan.price * 100, // USD cents
+          currency: "USD",
           name: "Percepta Galaxy",
           description: `${plan.name} Plan - ${plan.maxCompetitors} competitors`,
           prefill: {

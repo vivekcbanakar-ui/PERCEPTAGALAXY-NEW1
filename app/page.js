@@ -70,7 +70,7 @@ export default function Home() {
             href="/pricing"
             className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-bold text-lg transition transform hover:scale-105"
           >
-            Start Free Trial → 14 Days
+            Start Your Free Trial →
           </Link>
         ) : (
           <Link
@@ -80,6 +80,11 @@ export default function Home() {
             Go to Dashboard
           </Link>
         )}
+
+        <p className="text-slate-400 text-sm mt-6 max-w-2xl mx-auto">
+          Built for founders who want to <span className="text-purple-400 font-bold">WIN</span>.
+          $399/month. No contracts. Cancel anytime.
+        </p>
       </section>
 
       {/* Features */}
