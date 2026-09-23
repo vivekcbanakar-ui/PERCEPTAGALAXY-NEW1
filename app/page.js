@@ -123,19 +123,14 @@ export default function Home() {
           <p className="text-slate-400 text-sm">
             © 2026 Percepta Galaxy. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm">
-            <Link href="/terms" className="text-slate-400 hover:text-purple-400 transition">
-              Terms
-            </Link>
-            <Link href="/privacy" className="text-slate-400 hover:text-purple-400 transition">
-              Privacy
-            </Link>
-            <a
-              href="mailto:vivekcbanakar@gmail.com"
-              className="text-slate-400 hover:text-purple-400 transition"
-            >
-              Contact
-            </a>
+          <div className="flex gap-6 text-sm flex-wrap justify-center">
+            <Link href="/pricing" className="text-slate-400 hover:text-purple-400 transition">Pricing</Link>
+            <Link href="/for-founders" className="text-slate-400 hover:text-purple-400 transition">For Founders</Link>
+            <Link href="/free-tracker" className="text-slate-400 hover:text-purple-400 transition">Free Report</Link>
+            <Link href="/faq" className="text-slate-400 hover:text-purple-400 transition">FAQ</Link>
+            <Link href="/manifesto" className="text-slate-400 hover:text-purple-400 transition">Manifesto</Link>
+            <Link href="/terms" className="text-slate-400 hover:text-purple-400 transition">Terms</Link>
+            <Link href="/privacy" className="text-slate-400 hover:text-purple-400 transition">Privacy</Link>
           </div>
         </div>
       </footer>

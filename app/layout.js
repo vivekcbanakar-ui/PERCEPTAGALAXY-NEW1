@@ -31,7 +31,7 @@ export const metadata = {
       "Track your competitors in real-time. Get AI-powered insights on pricing changes, product launches, and marketing moves.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "Percepta Galaxy - AI Competitive Intelligence",
@@ -43,7 +43,7 @@ export const metadata = {
     title: "Percepta Galaxy - AI Competitive Intelligence",
     description:
       "Track your competitors in real-time. Get AI-powered insights on pricing changes, product launches, and marketing moves.",
-    images: ["/og-image.png"],
+    images: ["/og-image.svg"],
   },
   robots: {
     index: true,
