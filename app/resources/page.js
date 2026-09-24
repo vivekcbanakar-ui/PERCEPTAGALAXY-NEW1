@@ -1,7 +1,10 @@
-"use client";
-
 import Link from "next/link";
 import { useState } from "react";
+
+export const metadata = {
+  title: "Free Founder Resources | Percepta Galaxy",
+  description: "Cold email templates, LinkedIn scripts, and cold call scripts for B2B SaaS founders.",
+};
 
 export default function ResourcesPage() {
   const [email, setEmail] = useState("");
@@ -218,8 +221,3 @@ function Script({ title, body }) {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Free Founder Resources | Percepta Galaxy",
-  description: "Cold email templates, LinkedIn scripts, and cold call scripts for B2B SaaS founders.",
-};

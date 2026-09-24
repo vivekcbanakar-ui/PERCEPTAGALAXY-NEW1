@@ -1,7 +1,12 @@
-"use client";
-
 import { useState } from "react";
 import Link from "next/link";
+
+export const metadata = {
+  title: "Free Competitor Report | Percepta Galaxy",
+  description: "Get a free 7-day AI competitor analysis. See what your #1 threat is doing now and predict their next move.",
+};
+
+export default function FreeTrackerPage() {
 
 export default function FreeTrackerPage() {
   const [yourCompany, setYourCompany] = useState("");
@@ -170,8 +175,3 @@ export default function FreeTrackerPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Free Competitor Report | Percepta Galaxy",
-  description: "Get a free 7-day AI competitor analysis. See what your #1 threat is doing now and predict their next move.",
-};
