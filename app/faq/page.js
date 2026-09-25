@@ -4,8 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 
 const FAQS = [
-
-const FAQS = [
   {
     q: "What exactly does Percepta Galaxy track?",
     a: "We monitor your competitor's website, pricing page, changelog, blog, job postings, social media, and public footprint — 24/7. AI summarizes changes and predicts their next move.",
