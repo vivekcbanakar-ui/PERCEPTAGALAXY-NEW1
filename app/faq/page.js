@@ -1,10 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { useState } from "react";
 
-export const metadata = {
-  title: "FAQ | Percepta Galaxy",
-  description: "Common questions about Percepta Galaxy's AI competitor intelligence platform.",
-};
+const FAQS = [
 
 const FAQS = [
   {

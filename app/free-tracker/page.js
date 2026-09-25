@@ -1,12 +1,7 @@
+"use client";
+
 import { useState } from "react";
 import Link from "next/link";
-
-export const metadata = {
-  title: "Free Competitor Report | Percepta Galaxy",
-  description: "Get a free 7-day AI competitor analysis. See what your #1 threat is doing now and predict their next move.",
-};
-
-export default function FreeTrackerPage() {
 
 export default function FreeTrackerPage() {
   const [yourCompany, setYourCompany] = useState("");
@@ -65,7 +60,7 @@ export default function FreeTrackerPage() {
                 See what your <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">#1 competitor</span> is about to do
               </h1>
               <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-                Get a free 7-day AI-powered competitor report. We'll email you what they're doing now AND predict their next move.
+                Get a free 7-day AI-powered competitor report. We&apos;ll email you what they&apos;re doing now AND predict their next move.
               </p>
             </div>
 
@@ -86,7 +81,7 @@ export default function FreeTrackerPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Your main competitor's URL
+                  Your main competitor&apos;s URL
                 </label>
                 <input
                   type="url"
@@ -100,7 +95,7 @@ export default function FreeTrackerPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Your email (we'll send the report here)
+                  Your email (we&apos;ll send the report here)
                 </label>
                 <input
                   type="email"
@@ -148,9 +143,9 @@ export default function FreeTrackerPage() {
         ) : (
           <div className="bg-slate-900/60 border border-green-500/30 rounded-2xl p-12 text-center">
             <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-3xl font-bold mb-4 text-white">You're in!</h2>
+            <h2 className="text-3xl font-bold mb-4 text-white">You&apos;re in!</h2>
             <p className="text-lg text-slate-300 mb-6">
-              We're tracking <strong className="text-purple-400">{competitorUrl}</strong> for you. Your first report will arrive within 24 hours.
+              We&apos;re tracking <strong className="text-purple-400">{competitorUrl}</strong> for you. Your first report will arrive within 24 hours.
             </p>
             <p className="text-slate-400 mb-8">
               Check your email at <strong>{email}</strong> for next steps.
