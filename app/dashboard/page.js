@@ -12,17 +12,83 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [competitors, setCompetitors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
 
+  // Redirect if not signed in
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
 
+  // Load competitors from DB on mount
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetch("/api/competitors")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.competitors) setCompetitors(data.competitors);
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    }
+  }, [status]);
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!name.trim() || !url.trim()) {
+      setError("Please fill in both fields");
+      return;
+    }
+
+    setAdding(true);
+    try {
+      const res = await fetch("/api/competitors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), url: url.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to add competitor");
+        return;
+      }
+
+      setCompetitors([data.competitor, ...competitors]);
+      setName("");
+      setUrl("");
+      setSuccess(`Added ${data.competitor.name}!`);
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Remove this competitor?")) return;
+    try {
+      await fetch("/api/competitors", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      setCompetitors(competitors.filter((c) => c.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center text-white">
+        <div>Loading...</div>
       </div>
     );
   }
@@ -33,14 +99,18 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
-      {/* Header */}
+      {/* Nav */}
       <nav className="border-b border-purple-500/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            ✨ Percepta Galaxy
-          </h1>
-          <div className="flex items-center gap-4">
-            <span className="text-slate-300">{session.user?.email}</span>
+          <Link href="/">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent cursor-pointer">
+              ✨ Percepta Galaxy
+            </h1>
+          </Link>
+          <div className="flex gap-4 items-center">
+            <span className="text-sm text-slate-300">
+              {session.user?.email}
+            </span>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
               className="px-4 py-2 border border-purple-400 hover:bg-purple-400/10 rounded-lg transition"
@@ -51,17 +121,20 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {/* Stats Cards */}
+        <h1 className="text-4xl font-bold mb-8">
+          {session.user?.name ? `Hi ${session.user.name.split(" ")[0]}` : "Welcome"}
+        </h1>
+
+        {/* Plan stats */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-purple-900/30 border border-purple-500/20 p-6 rounded-lg">
-            <div className="text-sm text-slate-400 mb-2">Total Competitors</div>
-            <div className="text-3xl font-bold">0</div>
+            <div className="text-sm text-slate-400 mb-2">Competitors Tracked</div>
+            <div className="text-3xl font-bold">{competitors.length} / 3</div>
           </div>
           <div className="bg-purple-900/30 border border-purple-500/20 p-6 rounded-lg">
-            <div className="text-sm text-slate-400 mb-2">Plan Tier</div>
-            <div className="text-3xl font-bold text-purple-400">Free Trial</div>
+            <div className="text-sm text-slate-400 mb-2">Plan</div>
+            <div className="text-3xl font-bold">Free Trial</div>
           </div>
           <div className="bg-purple-900/30 border border-purple-500/20 p-6 rounded-lg">
             <div className="text-sm text-slate-400 mb-2">Days Remaining</div>
@@ -72,39 +145,7 @@ export default function DashboardPage() {
         {/* Add Competitor Section */}
         <div className="bg-purple-900/30 border border-purple-500/20 rounded-lg p-8 mb-12">
           <h2 className="text-2xl font-bold mb-6">Add a Competitor</h2>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setError("");
-              setSuccess("");
-
-              if (!name.trim() || !url.trim()) {
-                setError("Please fill in both fields");
-                return;
-              }
-
-              // Normalize URL — auto-prepend https:// if missing
-              let normalizedUrl = url.trim();
-              if (!/^https?:\/\//i.test(normalizedUrl)) {
-                normalizedUrl = "https://" + normalizedUrl;
-              }
-
-              // Basic URL validation
-              try {
-                new URL(normalizedUrl);
-              } catch {
-                setError("Please enter a valid URL (e.g. replit.com)");
-                return;
-              }
-
-              // Add to local list (will be persisted when DB is added)
-              setCompetitors([...competitors, { name: name.trim(), url: normalizedUrl, addedAt: new Date() }]);
-              setName("");
-              setUrl("");
-              setSuccess(`Added ${name.trim()}!`);
-            }}
-            className="space-y-4"
-          >
+          <form onSubmit={handleAdd} className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
               <input
                 type="text"
@@ -136,9 +177,10 @@ export default function DashboardPage() {
 
             <button
               type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-bold transition"
+              disabled={adding}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 rounded-lg font-bold transition"
             >
-              Add Competitor
+              {adding ? "Adding..." : "Add Competitor"}
             </button>
             <p className="text-xs text-slate-500">
               Tip: you can enter just <code className="text-purple-300">replit.com</code> — we&apos;ll add https:// for you.
@@ -149,24 +191,29 @@ export default function DashboardPage() {
         {/* Competitors List */}
         <div className="bg-purple-900/30 border border-purple-500/20 rounded-lg p-8">
           <h2 className="text-2xl font-bold mb-6">Your Competitors</h2>
-          {competitors.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12 text-slate-400">Loading...</div>
+          ) : competitors.length === 0 ? (
             <div className="text-center py-12 text-slate-400">
               <p className="text-lg mb-4">No competitors tracked yet</p>
               <p className="text-sm">Add your first competitor above to get started</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {competitors.map((c, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg">
+              {competitors.map((c) => (
+                <div key={c.id} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg">
                   <div>
                     <div className="font-bold text-white">{c.name}</div>
                     <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-sm text-purple-400 hover:text-purple-300">
                       {c.url}
                     </a>
                   </div>
-                  <div className="text-xs text-slate-500">
-                    Added {c.addedAt.toLocaleDateString()}
-                  </div>
+                  <button
+                    onClick={() => handleDelete(c.id)}
+                    className="text-red-400 hover:text-red-300 text-sm px-3 py-1 rounded hover:bg-red-500/10"
+                  >
+                    Remove
+                  </button>
                 </div>
               ))}
             </div>
@@ -188,3 +235,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+import Link from "next/link";

@@ -1,5 +1,8 @@
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { db } from "@/db";
+import { users, accounts, sessions, verificationTokens } from "@/db/schema";
 
 const providers = [
   GoogleProvider({
@@ -12,14 +15,20 @@ const providers = [
   }),
 ];
 
-// Email login via Resend is disabled until a database is configured.
-// NextAuth's email provider requires a DB to store verification tokens.
-// When you add a database (Supabase, Vercel Postgres, etc.), we'll wire this back up.
-
 export const authOptions = {
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+    verificationTokensTable: verificationTokens,
+  }),
   providers,
+  session: { strategy: "database" },
   callbacks: {
     async session({ session, user }) {
+      if (session.user) {
+        session.user.id = user.id;
+      }
       return session;
     },
   },
