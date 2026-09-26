@@ -2,11 +2,16 @@
 
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [competitors, setCompetitors] = useState([]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -67,41 +72,111 @@ export default function DashboardPage() {
         {/* Add Competitor Section */}
         <div className="bg-purple-900/30 border border-purple-500/20 rounded-lg p-8 mb-12">
           <h2 className="text-2xl font-bold mb-6">Add a Competitor</h2>
-          <form className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setError("");
+              setSuccess("");
+
+              if (!name.trim() || !url.trim()) {
+                setError("Please fill in both fields");
+                return;
+              }
+
+              // Normalize URL — auto-prepend https:// if missing
+              let normalizedUrl = url.trim();
+              if (!/^https?:\/\//i.test(normalizedUrl)) {
+                normalizedUrl = "https://" + normalizedUrl;
+              }
+
+              // Basic URL validation
+              try {
+                new URL(normalizedUrl);
+              } catch {
+                setError("Please enter a valid URL (e.g. replit.com)");
+                return;
+              }
+
+              // Add to local list (will be persisted when DB is added)
+              setCompetitors([...competitors, { name: name.trim(), url: normalizedUrl, addedAt: new Date() }]);
+              setName("");
+              setUrl("");
+              setSuccess(`Added ${name.trim()}!`);
+            }}
+            className="space-y-4"
+          >
             <div className="grid md:grid-cols-2 gap-4">
               <input
                 type="text"
-                placeholder="Competitor name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Competitor name (e.g. Replit)"
                 className="px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
               />
               <input
-                type="url"
-                placeholder="Website URL"
+                type="text"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Website URL (e.g. replit.com)"
                 className="px-4 py-3 bg-slate-800/50 border border-purple-500/30 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
               />
             </div>
+
+            {error && (
+              <div className="p-3 bg-red-500/20 border border-red-500/50 rounded text-red-300 text-sm">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="p-3 bg-green-500/20 border border-green-500/50 rounded text-green-300 text-sm">
+                {success}
+              </div>
+            )}
+
             <button
               type="submit"
               className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-bold transition"
             >
               Add Competitor
             </button>
+            <p className="text-xs text-slate-500">
+              Tip: you can enter just <code className="text-purple-300">replit.com</code> — we&apos;ll add https:// for you.
+            </p>
           </form>
         </div>
 
         {/* Competitors List */}
         <div className="bg-purple-900/30 border border-purple-500/20 rounded-lg p-8">
           <h2 className="text-2xl font-bold mb-6">Your Competitors</h2>
-          <div className="text-center py-12 text-slate-400">
-            <p className="text-lg mb-4">No competitors tracked yet</p>
-            <p className="text-sm">Add your first competitor above to get started</p>
-          </div>
+          {competitors.length === 0 ? (
+            <div className="text-center py-12 text-slate-400">
+              <p className="text-lg mb-4">No competitors tracked yet</p>
+              <p className="text-sm">Add your first competitor above to get started</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {competitors.map((c, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg">
+                  <div>
+                    <div className="font-bold text-white">{c.name}</div>
+                    <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-sm text-purple-400 hover:text-purple-300">
+                      {c.url}
+                    </a>
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    Added {c.addedAt.toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* CTA to Upgrade */}
         <div className="mt-12 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-lg p-8 text-center">
           <h3 className="text-2xl font-bold mb-4">Upgrade to track more competitors</h3>
-          <p className="text-slate-300 mb-6">Free trial limited to 1 competitor. Upgrade now to track up to 50.</p>
+          <p className="text-slate-300 mb-6">Free trial limited to 1 competitor. Upgrade now to track up to 10.</p>
           <button
             onClick={() => router.push("/pricing")}
             className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-bold transition"
