@@ -17,6 +17,7 @@
     "next-auth": "^4.24.10",
     "razorpay": "^2.9.5",
     "zod": "^3.23.8",
+    "resend": "^4.0.0",
     "drizzle-orm": "^0.36.0",
     "@neondatabase/serverless": "^0.10.0",
     "@auth/drizzle-adapter": "^1.7.0"

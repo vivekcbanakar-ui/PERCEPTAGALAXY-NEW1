@@ -180,8 +180,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Admin | Percepta Galaxy",
-  robots: { index: false, follow: false },
-};
