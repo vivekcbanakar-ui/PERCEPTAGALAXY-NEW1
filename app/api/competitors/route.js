@@ -3,7 +3,8 @@ import { authOptions } from "../auth-options";
 import { db } from "@/db";
 import { competitors } from "@/db/schema";
 import { ensureSchema } from "@/db/migrate";
-import { eq, desc } from "drizzle-orm";
+import { canAddCompetitor, getUserPlan } from "@/lib/subscription";
+import { eq, and, desc } from "drizzle-orm";
 
 // GET /api/competitors — list current user's competitors
 export async function GET() {
@@ -23,10 +24,18 @@ export async function GET() {
       .where(eq(competitors.userId, session.user.id))
       .orderBy(desc(competitors.addedAt));
 
-    return new Response(JSON.stringify({ competitors: userCompetitors }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    const planInfo = await getUserPlan(session.user.id);
+
+    return new Response(
+      JSON.stringify({
+        competitors: userCompetitors,
+        plan: planInfo.plan,
+        limit: planInfo.limit,
+        isPaid: planInfo.isPaid,
+        count: userCompetitors.length,
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error) {
     console.error("List competitors error:", error);
     return new Response(JSON.stringify({ error: "Failed to load competitors: " + error.message }), {
@@ -58,13 +67,34 @@ export async function POST(req) {
       });
     }
 
+    // Check current count
+    const existing = await db
+      .select()
+      .from(competitors)
+      .where(eq(competitors.userId, session.user.id));
+
+    const check = await canAddCompetitor(session.user.id, existing.length);
+
+    if (!check.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: `You've reached your ${check.plan} plan limit (${check.limit} competitor${
+            check.limit !== 1 ? "s" : ""
+          }). Upgrade to add more.`,
+          upgradeRequired: true,
+          currentPlan: check.plan,
+          limit: check.limit,
+        }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     // Normalize URL
     let normalizedUrl = url.trim();
     if (!/^https?:\/\//i.test(normalizedUrl)) {
       normalizedUrl = "https://" + normalizedUrl;
     }
 
-    // Validate
     try {
       new URL(normalizedUrl);
     } catch {
@@ -83,13 +113,17 @@ export async function POST(req) {
 
     await db.insert(competitors).values(competitor);
 
-    return new Response(JSON.stringify({ success: true, competitor }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        competitor,
+        remaining: check.limit - existing.length - 1,
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error) {
     console.error("Add competitor error:", error);
-    return new Response(JSON.stringify({ error: "Failed to add competitor" }), {
+    return new Response(JSON.stringify({ error: "Failed to add competitor: " + error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -120,7 +154,7 @@ export async function DELETE(req) {
 
     await db
       .delete(competitors)
-      .where(eq(competitors.id, id));
+      .where(and(eq(competitors.id, id), eq(competitors.userId, session.user.id)));
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
@@ -128,7 +162,7 @@ export async function DELETE(req) {
     });
   } catch (error) {
     console.error("Delete competitor error:", error);
-    return new Response(JSON.stringify({ error: "Failed to delete" }), {
+    return new Response(JSON.stringify({ error: "Failed to delete: " + error.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

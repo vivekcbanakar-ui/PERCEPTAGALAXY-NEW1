@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -14,6 +15,10 @@ export default function DashboardPage() {
   const [competitors, setCompetitors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [plan, setPlan] = useState("free");
+  const [limit, setLimit] = useState(1);
+  const [isPaid, setIsPaid] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Redirect if not signed in
   useEffect(() => {
@@ -29,6 +34,9 @@ export default function DashboardPage() {
         .then((r) => r.json())
         .then((data) => {
           if (data.competitors) setCompetitors(data.competitors);
+          if (data.plan) setPlan(data.plan);
+          if (data.limit !== undefined) setLimit(data.limit);
+          if (data.isPaid !== undefined) setIsPaid(data.isPaid);
         })
         .catch(() => {})
         .finally(() => setLoading(false));
@@ -56,6 +64,9 @@ export default function DashboardPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.upgradeRequired) {
+          setShowUpgradeModal(true);
+        }
         setError(data.error || "Failed to add competitor");
         return;
       }
@@ -63,7 +74,7 @@ export default function DashboardPage() {
       setCompetitors([data.competitor, ...competitors]);
       setName("");
       setUrl("");
-      setSuccess(`Added ${data.competitor.name}!`);
+      setSuccess(`Added ${data.competitor.name}!${data.remaining !== undefined ? ` (${data.remaining} slot${data.remaining !== 1 ? "s" : ""} left)` : ""}`);
     } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -130,15 +141,24 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-purple-900/30 border border-purple-500/20 p-6 rounded-lg">
             <div className="text-sm text-slate-400 mb-2">Competitors Tracked</div>
-            <div className="text-3xl font-bold">{competitors.length} / 3</div>
+            <div className="text-3xl font-bold">
+              {competitors.length} / {limit}
+              {competitors.length >= limit && (
+                <span className="ml-2 text-xs text-red-400 font-normal">LIMIT REACHED</span>
+              )}
+            </div>
           </div>
           <div className="bg-purple-900/30 border border-purple-500/20 p-6 rounded-lg">
             <div className="text-sm text-slate-400 mb-2">Plan</div>
-            <div className="text-3xl font-bold">Free Trial</div>
+            <div className="text-3xl font-bold capitalize">
+              {isPaid ? plan : "Free Trial"}
+            </div>
           </div>
           <div className="bg-purple-900/30 border border-purple-500/20 p-6 rounded-lg">
-            <div className="text-sm text-slate-400 mb-2">Days Remaining</div>
-            <div className="text-3xl font-bold">14</div>
+            <div className="text-sm text-slate-400 mb-2">Status</div>
+            <div className="text-3xl font-bold">
+              {isPaid ? "✓ Active" : "Trial"}
+            </div>
           </div>
         </div>
 
@@ -222,8 +242,13 @@ export default function DashboardPage() {
 
         {/* CTA to Upgrade */}
         <div className="mt-12 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 rounded-lg p-8 text-center">
-          <h3 className="text-2xl font-bold mb-4">Upgrade to track more competitors</h3>
-          <p className="text-slate-300 mb-6">Free trial limited to 1 competitor. Upgrade now to track up to 10.</p>
+          <h3 className="text-2xl font-bold mb-4">Ready for more?</h3>
+          <p className="text-slate-300 mb-6">
+            You're on the {isPaid ? plan : "Free Trial"} plan ({limit} competitor{limit !== 1 ? "s" : ""}).
+            {competitors.length >= limit
+              ? " You've reached your limit. Upgrade to add more."
+              : " Upgrade for unlimited insights and more competitors."}
+          </p>
           <button
             onClick={() => router.push("/pricing")}
             className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-bold transition"
@@ -231,6 +256,33 @@ export default function DashboardPage() {
             View Plans →
           </button>
         </div>
+
+        {/* Upgrade Modal */}
+        {showUpgradeModal && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-900 border border-purple-500/50 rounded-2xl p-8 max-w-md w-full text-center">
+              <div className="text-6xl mb-4">🚀</div>
+              <h3 className="text-2xl font-bold mb-2">You've hit your limit!</h3>
+              <p className="text-slate-300 mb-6">
+                Your {plan} plan includes {limit} competitor{limit !== 1 ? "s" : ""}. Upgrade to track more and unlock predictive AI insights.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setShowUpgradeModal(false)}
+                  className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-bold transition"
+                >
+                  Maybe Later
+                </button>
+                <button
+                  onClick={() => router.push("/pricing")}
+                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg font-bold transition"
+                >
+                  Upgrade Now →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
