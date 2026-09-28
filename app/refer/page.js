@@ -1,5 +1,3 @@
-"use client";
-
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";

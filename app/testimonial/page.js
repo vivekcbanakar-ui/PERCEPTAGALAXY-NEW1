@@ -1,7 +1,10 @@
-"use client";
-
 import { useState } from "react";
 import Link from "next/link";
+
+export const metadata = {
+  title: "Share Your Testimonial | Percepta Galaxy",
+  description: "Tell us how Percepta Galaxy has helped you stay ahead. Real testimonials help us grow.",
+};
 
 export default function TestimonialPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -149,8 +152,3 @@ export default function TestimonialPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Share Your Testimonial | Percepta Galaxy",
-  description: "Tell us how Percepta Galaxy has helped you stay ahead. Real testimonials help us grow.",
-};
