@@ -124,3 +124,18 @@ export const insights = pgTable("insight", {
   rawDiff: text("rawDiff"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
 });
+
+// Affiliate / Referral tracking
+export const referrals = pgTable("referral", {
+  id: text("id").notNull().primaryKey().$defaultFn(() => crypto.randomUUID()),
+  code: varchar("code", { length: 32 }).notNull().unique(),
+  referrerUserId: text("referrerUserId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  referredUserId: text("referredUserId").references(() => users.id, { onDelete: "set null" }),
+  referredEmail: text("referredEmail"),
+  status: varchar("status", { length: 32 }).notNull().default("pending"), // pending | converted | paid
+  rewardAmount: integer("rewardAmount").default(0), // in cents USD
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  convertedAt: timestamp("convertedAt"),
+});

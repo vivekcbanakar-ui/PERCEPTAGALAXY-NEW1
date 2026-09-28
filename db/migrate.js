@@ -95,6 +95,18 @@ CREATE TABLE IF NOT EXISTS "insight" (
   "rawDiff" text,
   "createdAt" timestamp NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS "referral" (
+  "id" text PRIMARY KEY,
+  "code" varchar(32) NOT NULL UNIQUE,
+  "referrerUserId" text NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+  "referredUserId" text REFERENCES "user"("id") ON DELETE SET NULL,
+  "referredEmail" text,
+  "status" varchar(32) NOT NULL DEFAULT 'pending',
+  "rewardAmount" integer DEFAULT 0,
+  "createdAt" timestamp NOT NULL DEFAULT now(),
+  "convertedAt" timestamp
+);
 `;
 
 let initialized = false;
