@@ -19,6 +19,8 @@ export default function DashboardPage() {
   const [limit, setLimit] = useState(1);
   const [isPaid, setIsPaid] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [tracking, setTracking] = useState({}); // { competitorId: bool }
+  const [latestInsights, setLatestInsights] = useState({}); // { competitorId: [insights] }
 
   // Redirect if not signed in
   useEffect(() => {
@@ -94,6 +96,55 @@ export default function DashboardPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleTrack = async (competitorId) => {
+    setTracking((t) => ({ ...t, [competitorId]: true }));
+    try {
+      const res = await fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ competitorId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Track failed");
+        return;
+      }
+
+      // Load insights
+      await loadInsights(competitorId);
+
+      if (data.insight) {
+        setSuccess(`🔍 ${data.insight.summary}`);
+      } else if (data.diff && !data.diff.changed) {
+        setSuccess("No changes detected since last scan.");
+      } else {
+        setSuccess("Snapshot saved.");
+      }
+    } catch (err) {
+      setError("Tracking failed: " + err.message);
+    } finally {
+      setTracking((t) => ({ ...t, [competitorId]: false }));
+    }
+  };
+
+  const loadInsights = async (competitorId) => {
+    try {
+      const res = await fetch(`/api/track?competitorId=${competitorId}`);
+      const data = await res.json();
+      if (data.insights) {
+        setLatestInsights((prev) => ({ ...prev, [competitorId]: data.insights }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleViewInsights = async (competitorId) => {
+    await loadInsights(competitorId);
   };
 
   if (status === "loading") {
@@ -221,19 +272,54 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {competitors.map((c) => (
-                <div key={c.id} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg">
-                  <div>
-                    <div className="font-bold text-white">{c.name}</div>
-                    <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-sm text-purple-400 hover:text-purple-300">
-                      {c.url}
-                    </a>
+                <div key={c.id} className="p-4 bg-slate-900/50 rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-white">{c.name}</div>
+                      <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-sm text-purple-400 hover:text-purple-300">
+                        {c.url}
+                      </a>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleTrack(c.id)}
+                        disabled={tracking[c.id]}
+                        className="text-purple-400 hover:text-purple-300 text-sm px-3 py-1 rounded hover:bg-purple-500/10 disabled:opacity-50 transition"
+                      >
+                        {tracking[c.id] ? "🔄 Tracking..." : "🔍 Track Now"}
+                      </button>
+                      <button
+                        onClick={() => handleViewInsights(c.id)}
+                        className="text-blue-400 hover:text-blue-300 text-sm px-3 py-1 rounded hover:bg-blue-500/10 transition"
+                      >
+                        📊 Insights
+                      </button>
+                      <button
+                        onClick={() => handleDelete(c.id)}
+                        className="text-red-400 hover:text-red-300 text-sm px-3 py-1 rounded hover:bg-red-500/10 transition"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => handleDelete(c.id)}
-                    className="text-red-400 hover:text-red-300 text-sm px-3 py-1 rounded hover:bg-red-500/10"
-                  >
-                    Remove
-                  </button>
+
+                  {latestInsights[c.id] && latestInsights[c.id].length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-purple-500/20">
+                      <div className="text-xs font-semibold text-slate-400 uppercase mb-2">Recent Insights</div>
+                      {latestInsights[c.id].slice(0, 3).map((ins) => (
+                        <div key={ins.id} className="text-sm text-slate-300 mb-1">
+                          <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                            ins.severity === 'high' ? 'bg-red-400' :
+                            ins.severity === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
+                          }`} />
+                          {ins.summary}
+                          <span className="text-slate-500 text-xs ml-2">
+                            {new Date(ins.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

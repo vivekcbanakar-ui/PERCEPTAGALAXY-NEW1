@@ -72,6 +72,29 @@ CREATE TABLE IF NOT EXISTS "subscription" (
   "createdAt" timestamp NOT NULL DEFAULT now(),
   "updatedAt" timestamp NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS "snapshot" (
+  "id" text PRIMARY KEY,
+  "competitorId" text NOT NULL REFERENCES "competitor"("id") ON DELETE CASCADE,
+  "url" text NOT NULL,
+  "title" text,
+  "contentHash" text NOT NULL,
+  "contentLength" integer NOT NULL,
+  "contentExcerpt" text,
+  "fetchedAt" timestamp NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS "insight" (
+  "id" text PRIMARY KEY,
+  "competitorId" text NOT NULL REFERENCES "competitor"("id") ON DELETE CASCADE,
+  "snapshotId" text NOT NULL REFERENCES "snapshot"("id") ON DELETE CASCADE,
+  "type" varchar(32) NOT NULL,
+  "severity" varchar(16) NOT NULL DEFAULT 'medium',
+  "title" text NOT NULL,
+  "summary" text NOT NULL,
+  "rawDiff" text,
+  "createdAt" timestamp NOT NULL DEFAULT now()
+);
 `;
 
 let initialized = false;

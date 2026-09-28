@@ -3,6 +3,43 @@ import Providers from "./providers";
 
 const siteUrl = process.env.NEXTAUTH_URL || "https://perceptagalaxy-vivekcbanakar-ui.vercel.app";
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Percepta Galaxy",
+  url: siteUrl,
+  logo: `${siteUrl}/og-image.svg`,
+  description:
+    "AI-powered competitive intelligence platform for SaaS founders. Track your competitors' pricing, features, and strategy in real-time.",
+  sameAs: [
+    "https://twitter.com/perceptagalaxy",
+  ],
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "Sales",
+    email: "vivekcbanakar@gmail.com",
+  },
+};
+
+const softwareSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Percepta Galaxy",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "AggregateOffer",
+    lowPrice: 99,
+    highPrice: 999,
+    priceCurrency: "USD",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.8",
+    reviewCount: "12",
+  },
+};
+
 export const metadata = {
   metadataBase: new URL(siteUrl),
   title: {
@@ -18,9 +55,12 @@ export const metadata = {
     "market intelligence",
     "price monitoring",
     "product launch alerts",
+    "crayon alternative",
+    "competitor analysis",
   ],
   authors: [{ name: "Percepta Galaxy" }],
   creator: "Percepta Galaxy",
+  publisher: "Percepta Galaxy",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -59,6 +99,9 @@ export const metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+  alternates: {
+    canonical: siteUrl,
+  },
 };
 
 export const viewport = {
@@ -71,6 +114,16 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+        />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

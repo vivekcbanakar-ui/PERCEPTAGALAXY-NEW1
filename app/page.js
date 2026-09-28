@@ -105,6 +105,73 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Social Proof — placeholder testimonials (replace with real ones) */}
+      <section className="max-w-7xl mx-auto px-6 py-20 border-t border-purple-500/20">
+        <h3 className="text-3xl font-bold text-center mb-4">Trusted by founders who want to WIN</h3>
+        <p className="text-slate-400 text-center mb-12 max-w-2xl mx-auto">
+          Early users from India, US, and EU. Join them to stop guessing what your competitor will do next.
+        </p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            {
+              quote: "Caught a pricing change in 30 minutes that would've taken me a week to find manually. Paid for itself in one cycle.",
+              author: "Founder",
+              role: "B2B SaaS, India",
+              initials: "VS",
+            },
+            {
+              quote: "Replaced my weekly competitor-checking ritual with a 5-min setup. Game changer for solo founders.",
+              author: "Indie Hacker",
+              role: "Productized service, US",
+              initials: "MJ",
+            },
+            {
+              quote: "Honestly skeptical. Now I check Percepta Galaxy before I check my own Slack.",
+              author: "Co-founder",
+              role: "Series A SaaS, India",
+              initials: "AR",
+            },
+          ].map((t, i) => (
+            <div key={i} className="bg-slate-900/60 border border-purple-500/20 rounded-xl p-6">
+              <div className="flex items-center gap-1 text-yellow-400 mb-3">
+                {[1, 2, 3, 4, 5].map((s) => <span key={s}>★</span>)}
+              </div>
+              <p className="text-slate-200 italic mb-4">"{t.quote}"</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+                  {t.initials}
+                </div>
+                <div>
+                  <div className="font-bold text-white text-sm">{t.author}</div>
+                  <div className="text-xs text-slate-400">{t.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-xs text-slate-500 mt-6">
+          User quotes are illustrative. Real testimonials added as we onboard customers.
+        </p>
+      </section>
+
+      {/* Trust bar — company count */}
+      <section className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border-y border-purple-500/20 py-12">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-sm text-slate-400 uppercase tracking-widest mb-4">
+            Tracking for founders at
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-8 text-2xl text-slate-500 font-bold opacity-60">
+            <span>STEALTH CO</span>
+            <span>·</span>
+            <span>SERIES A SAAS</span>
+            <span>·</span>
+            <span>PRE-SEED INDIE</span>
+            <span>·</span>
+            <span>BOOTSTRAPPED</span>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-6 py-20 text-center border-t border-purple-500/20">
         <h3 className="text-3xl font-bold mb-4">Ready to dominate?</h3>

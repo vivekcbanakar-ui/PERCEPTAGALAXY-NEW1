@@ -93,3 +93,34 @@ export const subscriptions = pgTable("subscription", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
+
+// Snapshots of competitor pages over time (for change detection)
+export const snapshots = pgTable("snapshot", {
+  id: text("id").notNull().primaryKey().$defaultFn(() => crypto.randomUUID()),
+  competitorId: text("competitorId")
+    .notNull()
+    .references(() => competitors.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  title: text("title"),
+  contentHash: text("contentHash").notNull(),
+  contentLength: integer("contentLength").notNull(),
+  contentExcerpt: text("contentExcerpt"), // First 5K chars for diff viewing
+  fetchedAt: timestamp("fetchedAt").notNull().defaultNow(),
+});
+
+// AI-generated insights about competitor changes
+export const insights = pgTable("insight", {
+  id: text("id").notNull().primaryKey().$defaultFn(() => crypto.randomUUID()),
+  competitorId: text("competitorId")
+    .notNull()
+    .references(() => competitors.id, { onDelete: "cascade" }),
+  snapshotId: text("snapshotId")
+    .notNull()
+    .references(() => snapshots.id, { onDelete: "cascade" }),
+  type: varchar("type", { length: 32 }).notNull(), // pricing | feature | content | design | other
+  severity: varchar("severity", { length: 16 }).notNull().default("medium"), // low | medium | high
+  title: text("title").notNull(),
+  summary: text("summary").notNull(),
+  rawDiff: text("rawDiff"),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+});
