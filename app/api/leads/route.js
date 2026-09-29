@@ -27,7 +27,7 @@ export async function POST(req) {
     await db.insert(leads).values(lead);
     console.log("New lead:", email);
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, id: lead.id }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
